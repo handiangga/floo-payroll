@@ -1,0 +1,5 @@
+# Replace this hostname with the dedicated payroll API hostname you control.
+# Add this block to your existing Caddy configuration; do not replace other apps.
+payroll-api.example.com {
+    reverse_proxy 127.0.0.1:4010
+}

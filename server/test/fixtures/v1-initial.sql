@@ -1,0 +1,10 @@
+CREATE TYPE "enum_Users_role" AS ENUM ('owner','admin');
+CREATE TYPE "enum_Workers_job" AS ENUM ('jahit','potong');
+CREATE TYPE "enum_Periods_status" AS ENUM ('open','closed');
+CREATE TABLE "Users" (id SERIAL PRIMARY KEY,name VARCHAR(255) NOT NULL,email VARCHAR(255) NOT NULL UNIQUE,"passwordHash" VARCHAR(255) NOT NULL,role "enum_Users_role" NOT NULL DEFAULT 'admin',"createdAt" TIMESTAMPTZ NOT NULL,"updatedAt" TIMESTAMPTZ NOT NULL);
+CREATE TABLE "Workers" (id SERIAL PRIMARY KEY,name VARCHAR(255) NOT NULL,job "enum_Workers_job" NOT NULL,destination VARCHAR(255) DEFAULT '',active BOOLEAN DEFAULT true,"createdAt" TIMESTAMPTZ NOT NULL,"updatedAt" TIMESTAMPTZ NOT NULL);
+CREATE TABLE "Models" (id SERIAL PRIMARY KEY,code VARCHAR(255) NOT NULL UNIQUE,name VARCHAR(255) NOT NULL,"sewingRate" INTEGER CHECK("sewingRate">=0),"cuttingRate" INTEGER CHECK("cuttingRate">=0),active BOOLEAN DEFAULT true,"createdAt" TIMESTAMPTZ NOT NULL,"updatedAt" TIMESTAMPTZ NOT NULL);
+CREATE TABLE "Periods" (id SERIAL PRIMARY KEY,date DATE NOT NULL UNIQUE,status "enum_Periods_status" NOT NULL DEFAULT 'open',"closedAt" TIMESTAMPTZ,"createdAt" TIMESTAMPTZ NOT NULL,"updatedAt" TIMESTAMPTZ NOT NULL);
+CREATE UNIQUE INDEX one_open_period ON "Periods" (status) WHERE status='open';
+CREATE TABLE "Payrolls" (id SERIAL PRIMARY KEY,"periodId" INTEGER NOT NULL REFERENCES "Periods"(id),"workerId" INTEGER NOT NULL REFERENCES "Workers"(id),"workerName" VARCHAR(255) NOT NULL,job VARCHAR(255) NOT NULL,"bookTotal" INTEGER NOT NULL,subtotal INTEGER NOT NULL,net INTEGER NOT NULL CHECK(net>=0),cash INTEGER NOT NULL CHECK(cash>=0 AND cash<=net),lines JSONB NOT NULL,adjustments JSONB NOT NULL,transfers JSONB NOT NULL,"createdAt" TIMESTAMPTZ NOT NULL,"updatedAt" TIMESTAMPTZ NOT NULL,UNIQUE("periodId","workerId"));
+CREATE TABLE "Audits" (id SERIAL PRIMARY KEY,"userId" INTEGER NOT NULL,action VARCHAR(255) NOT NULL,details JSONB NOT NULL,"createdAt" TIMESTAMPTZ NOT NULL,"updatedAt" TIMESTAMPTZ NOT NULL);

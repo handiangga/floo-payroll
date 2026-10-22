@@ -1,0 +1,17 @@
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: floo_payroll
+      POSTGRES_USER: floo
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in root .env}
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - floo_pg:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U floo -d floo_payroll"]
+      interval: 5s
+      retries: 10
+volumes:
+  floo_pg:
