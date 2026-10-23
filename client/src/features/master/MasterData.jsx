@@ -33,8 +33,9 @@ export default function Master({ kind, data, owner, refresh, action, busy }) {
         <div className="sectionhead">
           <h2>{models ? "Harga berdasarkan jobdes" : "Pekerja produksi"}</h2>
           {owner && (
-            <button disabled={busy} className="primary icon-button" title={models ? "Tambah model" : "Tambah pekerja"} aria-label={models ? "Tambah model" : "Tambah pekerja"} onClick={() => open(null)}>
+            <button disabled={busy} className="primary" title={models ? "Tambah model" : "Tambah pekerja"} aria-label={models ? "Tambah model" : "Tambah pekerja"} onClick={() => open(null)}>
               <Plus size={16} />
+              Tambah {models ? "model" : "pekerja"}
             </button>
           )}
         </div>
@@ -44,8 +45,8 @@ export default function Master({ kind, data, owner, refresh, action, busy }) {
             <thead>
               <tr>
                 {(models
-                  ? ["Kode", "Model", "Jahit / pcs", "Potong / pcs", ""]
-                  : ["Nama", "Jobdes", "Tujuan transfer", ""]
+                  ? ["Kode", "Model", "Jahit / pcs", "Potong / pcs", "Aksi"]
+                  : ["Nama", "Jobdes", "Tujuan transfer", "Aksi"]
                 ).map((v, i) => (
                   <th key={i}>{v}</th>
                 ))}

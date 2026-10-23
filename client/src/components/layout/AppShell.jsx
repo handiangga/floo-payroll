@@ -5,7 +5,7 @@ import {
   LogOut,
   NotebookPen,
   Users,
-  History,
+  LayoutDashboard,
   Tags,
 } from "lucide-react";
 export default function AppShell({
@@ -30,9 +30,9 @@ export default function AppShell({
         </div>
         <nav>
           {[
+            ["dashboard", "Ringkasan", LayoutDashboard],
             ["input", "Input gaji", NotebookPen],
-            ["rekap", "Rekap mingguan", Users],
-            ["history", "Riwayat periode", History],
+            ["rekap", "Rekap & riwayat", Users],
             ["models", "Model & tarif", Tags],
             ["workers", "Data pekerja", Users],
           ].map(([id, label, Icon]) => (
@@ -67,7 +67,7 @@ export default function AppShell({
       <div className="workspace">
         <header>
           <span>Penggajian borongan</span>
-          <span className="badge">Floo Fashion</span>
+          <span className="badge">Floo Fashion · V2</span>
         </header>
         {children}
       </div>

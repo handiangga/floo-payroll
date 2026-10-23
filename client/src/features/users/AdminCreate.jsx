@@ -9,7 +9,7 @@ export default function AdminCreate({ action, busy }) {
     [b, setB] = useState({ name: "", email: "", password: "" });
   return (
     <div className="box">
-      <button className="icon-button" title="Tambah akun admin" aria-label="Tambah akun admin" disabled={busy} onClick={() => setShow(!show)}><UserPlus size={18} /></button>
+      <button title="Tambah akun admin" aria-label="Tambah akun admin" disabled={busy} onClick={() => setShow(!show)}><UserPlus size={18} />Tambah akun admin</button>
       {show && (
         <FormModal title="Tambah akun admin" busy={busy} onClose={() => setShow(false)}>
         <form

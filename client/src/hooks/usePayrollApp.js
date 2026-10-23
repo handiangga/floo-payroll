@@ -9,7 +9,7 @@ export default function usePayrollApp() {
     [boot, setBoot] = useState({ workers: [], models: [], periods: [] }),
     [periodId, setPeriodId] = useState(""),
     [rows, setRows] = useState([]),
-    [tab, setTab] = useState("input"),
+    [tab, setTab] = useState("dashboard"),
     [note, setNote] = useState(null),
     [edit, setEdit] = useState(null),
     [busy, setBusy] = useState(false),

@@ -207,6 +207,7 @@ export default function PayrollForm({
               onClick={() => setLines([...lines, { modelId: "", qty: 1 }])}
             >
               <Plus size={16} />
+              Tambah model pekerjaan
             </button>
           </section>
           <section className="box">
@@ -223,6 +224,7 @@ export default function PayrollForm({
                 }
               >
                 <Plus size={16} />
+                Tambah penyesuaian
               </button>
             </div>
             {adj.length === 0 && (
@@ -363,6 +365,7 @@ export default function PayrollForm({
               }
             >
               <Plus size={18} />
+              Tambah tujuan transfer
             </button>
             {mainTransfer < 0 && (
               <p className="error">Pembagian melebihi gaji bersih.</p>

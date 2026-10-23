@@ -7,7 +7,7 @@ import AppShell from "./components/layout/AppShell";
 import usePayrollApp from "./hooks/usePayrollApp";
 import Login from "./pages/LoginPage";
 import RecapPage from "./pages/RecapPage";
-import HistoryPage from "./pages/HistoryPage";
+import DashboardPage from "./pages/DashboardPage";
 import PayrollForm from "./features/payroll/PayrollForm";
 import Receipt from "./features/payroll/Receipt";
 import Master from "./features/master/MasterData";
@@ -69,8 +69,8 @@ export default function App() {
               {
                 {
                   input: "Input gaji mingguan",
-                  rekap: "Rekap mingguan",
-                  history: "Riwayat periode",
+                  dashboard: "Ringkasan penggajian",
+                  rekap: "Rekap & riwayat",
                   models: "Model & tarif",
                   workers: "Data pekerja",
                 }[tab]
@@ -85,9 +85,10 @@ export default function App() {
             onClick={newPeriod}
           >
             <Plus size={17} />
+            Buka periode baru
           </button>
         </div>
-        {!["models", "workers"].includes(tab) && (
+        {["input", "rekap"].includes(tab) && (
           <div className="periodbar">
             <Field label="Periode Sabtu">
               <select
@@ -176,12 +177,7 @@ export default function App() {
                 }}
               />
             )}
-            {tab === "history" && (
-              <HistoryPage
-                periods={boot.periods}
-                {...{ setPeriodId, setTab }}
-              />
-            )}
+            {tab === "dashboard" && <DashboardPage periods={boot.periods} onPeriod={(id) => { setPeriodId(String(id)); setTab("rekap"); }} />}
             {tab === "models" && (
               <Master
                 kind="models"
