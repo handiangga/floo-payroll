@@ -165,12 +165,14 @@ export default function Master({ kind, data, owner, refresh, action }) {
               <>
                 <Field label="Tarif jahit / pcs (kosong = belum diatur)">
                   <Amount
+                    money
                     value={edit.sewingRate}
                     onChange={(v) => change("sewingRate", v)}
                   />
                 </Field>
                 <Field label="Tarif potong / pcs (kosong = belum diatur)">
                   <Amount
+                    money
                     value={edit.cuttingRate}
                     onChange={(v) => change("cuttingRate", v)}
                   />

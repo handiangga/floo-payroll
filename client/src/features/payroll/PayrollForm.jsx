@@ -253,6 +253,7 @@ export default function PayrollForm({
                   </Field>
                   <Field label="Tarif (Rp)">
                     <Amount
+                      money
                       required
                       value={a.rate}
                       onChange={(v) => change("rate", v)}
@@ -289,7 +290,7 @@ export default function PayrollForm({
           <section className="box">
             <h2>Pembagian gaji</h2>
             <Field label="Cash yang diminta (Rp)">
-              <Amount required value={cash} onChange={setCash} />
+              <Amount money required value={cash} onChange={setCash} />
             </Field>
             <div className="summaryrow">
               <span>Sisa transfer otomatis</span>
@@ -324,6 +325,7 @@ export default function PayrollForm({
                 </Field>
                 <Field label="Nominal (Rp)">
                   <Amount
+                    money
                     required
                     value={t.amount}
                     onChange={(v) =>
