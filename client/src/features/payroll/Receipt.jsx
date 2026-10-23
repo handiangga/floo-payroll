@@ -25,7 +25,7 @@ export default function Receipt({ row: r, period, onBack }) {
           </strong>
           <span>{period && dateLabel(period.date)}</span>
         </div>
-        <table>
+        <div className="overflow-x-auto"><table>
           <thead>
             <tr>
               <th>Model / pekerjaan</th>
@@ -55,7 +55,7 @@ export default function Receipt({ row: r, period, onBack }) {
               </tr>
             ))}
           </tbody>
-        </table>
+        </table></div>
         <div className="summaryrow total">
           <strong>Gaji bersih</strong>
           <strong>{rup(r.net)}</strong>

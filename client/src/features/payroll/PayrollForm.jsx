@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { rup } from "../../lib/format";
 import { Field, Amount } from "../../components/ui/Fields";
 import { Trash2, Plus } from "lucide-react";
@@ -10,6 +10,12 @@ export default function PayrollForm({
   onSave,
   onCancel,
 }) {
+  const dirty = useRef(false);
+  useEffect(() => {
+    const warn = (e) => { if (dirty.current) { e.preventDefault(); e.returnValue = ""; } };
+    window.addEventListener("beforeunload", warn);
+    return () => window.removeEventListener("beforeunload", warn);
+  }, []);
   const [workerId, setWorker] = useState(edit?.workerId || ""),
     [lines, setLines] = useState(
       edit?.lines.map((l) => ({ modelId: l.modelId, qty: l.qty })) || [
@@ -64,6 +70,8 @@ export default function PayrollForm({
   }
   return (
     <form
+      onChangeCapture={() => { dirty.current = true; }}
+      onClickCapture={(e) => { const button = e.target.closest("button"); if (button?.type === "button" && button !== e.target.closest('[data-cancel]')) dirty.current = true; }}
       onSubmit={(e) => {
         e.preventDefault();
         if (!valid) return;
@@ -95,7 +103,7 @@ export default function PayrollForm({
             <div className="sectionhead">
               <h2>{edit ? "Edit rekap" : "Pekerjaan minggu ini"}</h2>
               {edit && (
-                <button type="button" onClick={onCancel}>
+                <button data-cancel type="button" disabled={busy} onClick={() => { if (!dirty.current || window.confirm("Isian belum disimpan. Batalkan perubahan?")) onCancel(); }}>
                   Batal edit
                 </button>
               )}
@@ -194,17 +202,18 @@ export default function PayrollForm({
             ))}
             <button
               className="w-full border-dashed mt-4"
+              title="Tambah model" aria-label="Tambah model"
               type="button"
               onClick={() => setLines([...lines, { modelId: "", qty: 1 }])}
             >
               <Plus size={16} />
-              Tambah model
             </button>
           </section>
           <section className="box">
             <div className="sectionhead">
               <h2>Tambahan & potongan</h2>
               <button
+                title="Tambah tambahan atau potongan" aria-label="Tambah tambahan atau potongan"
                 type="button"
                 onClick={() =>
                   setAdj([
@@ -214,7 +223,6 @@ export default function PayrollForm({
                 }
               >
                 <Plus size={16} />
-                Tambah
               </button>
             </div>
             {adj.length === 0 && (
@@ -271,7 +279,7 @@ export default function PayrollForm({
             })}
           </section>
         </div>
-        <div>
+        <div className="payroll-summary">
           <section className="box">
             <h2>Ringkasan gaji</h2>
             <div className="summaryrow">
@@ -347,17 +355,19 @@ export default function PayrollForm({
               </div>
             ))}
             <button
+              title="Tambah tujuan transfer" aria-label="Tambah tujuan transfer"
               type="button"
               className="w-full"
               onClick={() =>
                 setOthers([...others, { destination: "", amount: 0 }])
               }
             >
-              + Bagi ke tujuan lain
+              <Plus size={18} />
             </button>
             {mainTransfer < 0 && (
               <p className="error">Pembagian melebihi gaji bersih.</p>
             )}
+            {!valid && <p className="notice" role="status">{!worker ? "Pilih pekerja terlebih dahulu." : !lines.length ? "Tambahkan minimal satu model pekerjaan." : evaluated.some((l) => !l.modelId || !(l.qty > 0)) ? "Pilih model dan isi jumlah lebih dari 0 pada setiap baris." : evaluated.some((l) => l.rate == null) ? "Tarif model belum tersedia untuk jobdes ini. Lengkapi di Model & Tarif." : net < 0 ? "Potongan melebihi total upah. Periksa kembali rinciannya." : "Pembagian cash dan transfer melebihi gaji bersih."}</p>}
             <button className="primary w-full mt-4" disabled={busy || !valid}>
               {busy
                 ? "Menyimpan…"
@@ -368,6 +378,7 @@ export default function PayrollForm({
           </section>
         </div>
       </div>
+      <div className="mobile-payroll-total no-print"><div><small>Gaji bersih</small><strong>{rup(net)}</strong><small>Cash {rup(cash)} · Transfer {rup(transfer)}</small></div><button className="primary" disabled={busy || !valid}>{busy ? "Menyimpan…" : "Simpan"}</button></div>
     </form>
   );
 }

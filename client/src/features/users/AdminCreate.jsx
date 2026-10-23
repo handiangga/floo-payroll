@@ -1,14 +1,17 @@
 import { useState } from "react";
+import FormModal from "../../components/ui/FormModal";
 import Swal from "sweetalert2";
+import { UserPlus } from "lucide-react";
 import { api } from "../../lib/api";
 import { Field } from "../../components/ui/Fields";
-export default function AdminCreate({ action }) {
+export default function AdminCreate({ action, busy }) {
   const [show, setShow] = useState(false),
     [b, setB] = useState({ name: "", email: "", password: "" });
   return (
     <div className="box">
-      <button onClick={() => setShow(!show)}>Tambah akun admin</button>
+      <button className="icon-button" title="Tambah akun admin" aria-label="Tambah akun admin" disabled={busy} onClick={() => setShow(!show)}><UserPlus size={18} /></button>
       {show && (
+        <FormModal title="Tambah akun admin" busy={busy} onClose={() => setShow(false)}>
         <form
           className="mt-4"
           onSubmit={(e) => {
@@ -21,7 +24,7 @@ export default function AdminCreate({ action }) {
             });
           }}
         >
-          <div className="grid sm:grid-cols-3 gap-3">
+          <div className="grid gap-3">
             {["name", "email", "password"].map((k) => (
               <Field label={k === "name" ? "Nama" : k} key={k}>
                 <input
@@ -34,8 +37,10 @@ export default function AdminCreate({ action }) {
               </Field>
             ))}
           </div>
-          <button className="primary">Buat admin</button>
+          <button disabled={busy} className="primary">{busy ? "Menyimpan…" : "Buat admin"}</button>
+          <button type="button" disabled={busy} className="ml-2" onClick={() => setShow(false)}>Batal</button>
         </form>
+        </FormModal>
       )}
     </div>
   );

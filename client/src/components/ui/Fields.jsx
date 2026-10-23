@@ -1,7 +1,7 @@
 export function Field({ label, children }) {
   return (
     <label className="field">
-      {label}
+      {label}{Array.isArray(children) ? null : children?.props?.required && <span className="required-mark" aria-label="wajib diisi"> *</span>}
       {children}
     </label>
   );

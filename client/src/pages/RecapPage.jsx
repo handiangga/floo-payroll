@@ -1,7 +1,7 @@
 import { rup } from "../lib/format";
 import { api } from "../lib/api";
-import { ask } from "../lib/dialogs";
-import { Printer, Trash2 } from "lucide-react";
+import { ask, success } from "../lib/dialogs";
+import { Printer, Trash2, Pencil, FileText } from "lucide-react";
 export default function RecapPage({
   rows,
   period,
@@ -11,6 +11,7 @@ export default function RecapPage({
   setTab,
   action,
   loadRows,
+  busy,
 }) {
   const sums = rows.reduce(
     (s, r) => ({
@@ -22,6 +23,7 @@ export default function RecapPage({
   );
   return (
     <>
+      <div className="print-heading"><h1>Rekap gaji mingguan</h1><p>Floo Fashion · Periode {period?.date || "—"}</p></div>
       <div className="stats">
         {[
           ["Total gaji", sums.net],
@@ -54,7 +56,7 @@ export default function RecapPage({
                   "Gaji bersih",
                   "Cash",
                   "Transfer",
-                  "",
+                  <span className="no-print">Aksi</span>,
                 ].map((h, i) => (
                   <th key={i}>{h}</th>
                 ))}
@@ -79,21 +81,25 @@ export default function RecapPage({
                       </div>
                     ))}
                   </td>
-                  <td>
+                  <td className="no-print">
                     <div className="flex gap-2 flex-wrap">
-                      <button onClick={() => setNote(r)}>Nota</button>
+                      <button className="icon-button" title="Lihat nota" aria-label={"Lihat nota " + r.workerName} onClick={() => setNote(r)}><FileText size={18} /></button>
                       {period?.status === "open" && (
                         <>
                           <button
+                            className="icon-button" title="Edit" aria-label={"Edit rekap " + r.workerName}
+                            disabled={busy}
                             onClick={() => {
                               setEdit(r);
                               setTab("input");
                             }}
                           >
-                            Edit
+                            <Pencil size={18} />
                           </button>
                           <button
                             aria-label="Hapus rekap"
+                            className="icon-button text-red-700" title="Hapus rekap"
+                            disabled={busy}
                             onClick={async () => {
                               if (
                                 await ask(
@@ -107,6 +113,7 @@ export default function RecapPage({
                                     "DELETE",
                                   );
                                   await loadRows();
+                                  await success("Rekap berhasil dihapus.");
                                 });
                             }}
                           >

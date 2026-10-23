@@ -1,9 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Swal from "sweetalert2";
 import { api, hasSession } from "../lib/api";
 import { ask, fail } from "../lib/dialogs";
 import { today } from "../lib/format";
 export default function usePayrollApp() {
+  const actionLock = useRef(false);
   const [user, setUser] = useState(null),
     [boot, setBoot] = useState({ workers: [], models: [], periods: [] }),
     [periodId, setPeriodId] = useState(""),
@@ -49,13 +50,15 @@ export default function usePayrollApp() {
     setNote(null);
   }, [periodId]);
   async function action(fn) {
-    if (busy) return;
+    if (actionLock.current) return;
+    actionLock.current = true;
     setBusy(true);
     try {
       await fn();
     } catch (e) {
       fail(e);
     } finally {
+      actionLock.current = false;
       setBusy(false);
     }
   }

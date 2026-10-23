@@ -1,3 +1,5 @@
+import { useState } from "react";
+import { Menu, X } from "lucide-react";
 import {
   Scissors,
   LogOut,
@@ -14,9 +16,12 @@ export default function AppShell({
   onLogout,
   children,
 }) {
+  const [menuOpen, setMenuOpen] = useState(false);
   return (
     <div className="app">
-      <aside>
+      <div className="mobilebar"><span className="brand">FLOO<small>PRODUKSI</small></span><button aria-label={menuOpen ? "Tutup menu" : "Buka menu"} aria-expanded={menuOpen} aria-controls="main-sidebar" onClick={() => setMenuOpen(!menuOpen)}>{menuOpen ? <X /> : <Menu />}</button></div>
+      {menuOpen && <button className="menu-backdrop" aria-label="Tutup menu" onClick={() => setMenuOpen(false)} />}
+      <aside id="main-sidebar" className={menuOpen ? "menu-open" : ""} onKeyDown={(e) => { if (e.key === "Escape") setMenuOpen(false); }}>
         <div className="brand">
           <Scissors size={23} />
           <div>
@@ -37,6 +42,7 @@ export default function AppShell({
               onClick={() => {
                 setTab(id);
                 setNote(null);
+                setMenuOpen(false);
               }}
             >
               <Icon size={18} />

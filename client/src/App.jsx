@@ -80,11 +80,11 @@ export default function App() {
           </div>
           <button
             className="primary"
+            title="Buka periode baru" aria-label="Buka periode baru"
             disabled={busy || boot.periods.some((p) => p.status === "open")}
             onClick={newPeriod}
           >
             <Plus size={17} />
-            Buka periode baru
           </button>
         </div>
         {!["models", "workers"].includes(tab) && (
@@ -147,7 +147,7 @@ export default function App() {
                       setTab("rekap");
                       Swal.fire({
                         icon: "success",
-                        title: "Rekap tersimpan",
+                        title: edit ? "Perubahan sudah disimpan" : "Rekap berhasil ditambahkan",
                         timer: 1100,
                         showConfirmButton: false,
                       });
@@ -172,6 +172,7 @@ export default function App() {
                   setTab,
                   action,
                   loadRows,
+                  busy,
                 }}
               />
             )}
@@ -184,6 +185,7 @@ export default function App() {
             {tab === "models" && (
               <Master
                 kind="models"
+                busy={busy}
                 data={boot.models}
                 owner={owner}
                 refresh={refresh}
@@ -194,12 +196,13 @@ export default function App() {
               <>
                 <Master
                   kind="workers"
+                  busy={busy}
                   data={boot.workers}
                   owner={owner}
                   refresh={refresh}
                   action={action}
                 />
-                {owner && <AdminCreate action={action} />}
+                {owner && <AdminCreate action={action} busy={busy} />}
               </>
             )}
           </>

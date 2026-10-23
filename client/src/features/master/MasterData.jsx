@@ -1,13 +1,16 @@
 import { useState } from "react";
+import FormModal from "../../components/ui/FormModal";
 import { rup } from "../../lib/format";
 import { api } from "../../lib/api";
-import { ask } from "../../lib/dialogs";
+import { ask, success } from "../../lib/dialogs";
 import { Field, Amount } from "../../components/ui/Fields";
-import { Trash2, Plus } from "lucide-react";
-export default function Master({ kind, data, owner, refresh, action }) {
+import { Trash2, Plus, Pencil } from "lucide-react";
+export default function Master({ kind, data, owner, refresh, action, busy }) {
+  const [query, setQuery] = useState("");
   const [edit, setEdit] = useState(null),
     [creating, setCreating] = useState(false);
   const models = kind === "models";
+  const filtered = data.filter((d) => [d.name, d.code, d.destination, d.job === "jahit" ? "Penjahit" : "Pemotong"].filter(Boolean).join(" ").toLocaleLowerCase("id").includes(query.trim().toLocaleLowerCase("id")));
   const empty = models
     ? { code: "", name: "", sewingRate: "", cuttingRate: "" }
     : { name: "", job: "jahit", destination: "" };
@@ -30,13 +33,13 @@ export default function Master({ kind, data, owner, refresh, action }) {
         <div className="sectionhead">
           <h2>{models ? "Harga berdasarkan jobdes" : "Pekerja produksi"}</h2>
           {owner && (
-            <button className="primary" onClick={() => open(null)}>
+            <button disabled={busy} className="primary icon-button" title={models ? "Tambah model" : "Tambah pekerja"} aria-label={models ? "Tambah model" : "Tambah pekerja"} onClick={() => open(null)}>
               <Plus size={16} />
-              Tambah {models ? "model" : "pekerja"}
             </button>
           )}
         </div>
-        <div className="overflow-x-auto">
+        <div className="searchbar no-print"><input type="search" aria-label={models ? "Cari model" : "Cari pekerja"} placeholder={models ? "Cari nama atau kode model…" : "Cari nama, jobdes, atau tujuan transfer…"} value={query} onChange={(e) => setQuery(e.target.value)} /><small role="status">{filtered.length} dari {data.length} data</small></div>
+        <div className={`overflow-x-auto data-table ${models ? "model-table" : ""}`}>
           <table>
             <thead>
               <tr>
@@ -49,7 +52,7 @@ export default function Master({ kind, data, owner, refresh, action }) {
               </tr>
             </thead>
             <tbody>
-              {data.map((d) => (
+              {filtered.map((d) => (
                 <tr key={d.id}>
                   {models ? (
                     <>
@@ -76,10 +79,13 @@ export default function Master({ kind, data, owner, refresh, action }) {
                   <td>
                     {owner && (
                       <div className="flex gap-2">
-                        <button onClick={() => open(d)}>Edit</button>
+                        <button className="icon-button" title="Edit" aria-label={"Edit " + d.name} disabled={busy} onClick={() => open(d)}><Pencil size={18} /></button>
                         {
                           <button
-                            className="text-red-700"
+                            className="text-red-700 icon-button"
+                            title="Hapus"
+                            aria-label={"Hapus " + d.name}
+                            disabled={busy}
                             onClick={async () => {
                               if (
                                 await ask(
@@ -95,11 +101,11 @@ export default function Master({ kind, data, owner, refresh, action }) {
                                   await api("/" + kind + "/" + d.id, "DELETE");
                                   if (edit?.id === d.id) setEdit(null);
                                   await refresh();
+                                  await success("Data berhasil dihapus.");
                                 });
                             }}
                           >
                             <Trash2 size={15} />
-                            Hapus
                           </button>
                         }
                       </div>
@@ -109,11 +115,13 @@ export default function Master({ kind, data, owner, refresh, action }) {
               ))}
             </tbody>
           </table>
+          {!filtered.length && <div className="empty"><p>{data.length ? "Tidak ada data yang cocok. Coba kata kunci lain." : models ? "Belum ada model. Gunakan tombol + untuk menambahkan model dan tarif." : "Belum ada pekerja. Gunakan tombol + untuk menambahkan pekerja."}</p></div>}
         </div>
       </div>
       {edit && (
+        <FormModal title={`${creating ? "Tambah" : "Edit"} ${models ? "model" : "pekerja"}`} busy={busy} onClose={() => setEdit(null)}>
         <form
-          className="box"
+          className="modal-form"
           onSubmit={(e) => {
             e.preventDefault();
             action(async () => {
@@ -138,12 +146,10 @@ export default function Master({ kind, data, owner, refresh, action }) {
               );
               await refresh();
               setEdit(null);
+              await success(creating ? "Data baru berhasil ditambahkan." : "Perubahan sudah disimpan.");
             });
           }}
         >
-          <h2>
-            {creating ? "Tambah" : "Edit"} {models ? "model" : "pekerja"}
-          </h2>
           <div className="grid sm:grid-cols-2 gap-4">
             {models && (
               <Field label="Kode model">
@@ -199,12 +205,13 @@ export default function Master({ kind, data, owner, refresh, action }) {
             )}
           </div>
           <div className="flex gap-2">
-            <button className="primary">Simpan</button>
-            <button type="button" onClick={() => setEdit(null)}>
+            <button disabled={busy} className="primary">{busy ? "Menyimpan…" : "Simpan"}</button>
+            <button disabled={busy} type="button" onClick={() => setEdit(null)}>
               Batal
             </button>
           </div>
         </form>
+        </FormModal>
       )}
     </>
   );
