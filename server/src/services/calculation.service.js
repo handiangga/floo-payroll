@@ -17,6 +17,7 @@ export const payrollSchema = z.object({
       z.object({
         label: z.string().trim().min(1).max(160),
         kind: z.enum(["addition", "deduction"]),
+        category: z.enum(["bon", "other"]).optional(),
         qty: z.number().int().min(1).max(100000),
         rate: money,
       }),

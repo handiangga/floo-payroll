@@ -577,6 +577,15 @@ tbody tr:hover { background: #f7faf8; }
 }
 .icon-button { width: 44px; height: 44px; padding: 10px; flex-shrink: 0; }
 .print-heading { display: none; }
+.print-only { display: none; }
+.adjustrow.deduction-input { grid-template-columns: 100px 110px minmax(100px, 1fr) minmax(130px, 1fr) 44px; }
+.bon-summary { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.bon-summary h2 { margin-bottom: 4px; }
+.bon-summary > strong { font-size: 24px; font-variant-numeric: tabular-nums; }
+.receipt-deductions { margin: 16px 0; padding: 0 10px; }
+.receipt-deductions .summaryrow { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: baseline; }
+.receipt-deductions .summaryrow > :last-child { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+@media (max-width: 700px) { .adjustrow.deduction-input { grid-template-columns: 1fr 1fr; } }
 .report-trend { display: grid; gap: 12px; }
 .trend-item { display: grid; grid-template-columns: 170px minmax(30px, 1fr) 150px; text-align: left; border: 0; background: transparent; }
 .trend-item strong { text-align: right; font-variant-numeric: tabular-nums; }
@@ -738,4 +747,57 @@ input:user-invalid, select:user-invalid { border-color: #ad392d; background: #ff
     background: none;
     padding: 0;
   }
+  /* Compact A4 recap, independent of screen cards and receipt styling. */
+  .mobilebar, .menu-backdrop { display: none !important; }
+  .recap-report { font-family: Arial, sans-serif; color: #171410; line-height: 1.25; }
+  .recap-report .print-heading { margin: 0 0 5mm; }
+  .recap-report .print-heading h1 { font-size: 16pt; line-height: 1.25; margin: 0 0 2mm; font-weight: 700; }
+  .recap-report .print-heading p { font-size: 10pt; color: #171410; }
+  .recap-report .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; margin: 0 0 5mm; break-inside: avoid; }
+  .recap-report .stats .box { padding: 3mm; margin: 0; border-radius: 0; background: #f3eee3; }
+  .recap-report .stats small { font-size: 10pt; color: #171410; }
+  .recap-report .stats strong { font-size: 10pt; margin: 1mm 0 0; line-height: 1.25; letter-spacing: 0; color: #171410; }
+  .recap-report > .box { margin: 0; padding: 0; }
+  .recap-report .sectionhead { display: none; }
+  .recap-report .print-only { display: table-cell; }
+  .recap-report span.print-only { display: inline; }
+  .recap-report tfoot.print-only { display: table-row-group; }
+  .recap-report table { table-layout: fixed; width: 100%; }
+  .recap-report th, .recap-report td { padding: 2mm 1.5mm; font-size: 10pt; line-height: 1.25; color: #171410; vertical-align: middle; border-bottom: .3pt solid #b9ae9d; }
+  .recap-report th { background: #f3eee3; font-weight: 700; border-bottom: .8pt solid #171410; }
+  .recap-report th:nth-child(1) { width: 20%; }
+  .recap-report th:nth-child(2) { width: 15%; }
+  .recap-report th:nth-child(3), .recap-report th:nth-child(4), .recap-report th:nth-child(5) { width: 17%; }
+  .recap-report th:nth-child(6) { width: 14%; display: table-cell; }
+  .recap-report td:nth-child(3), .recap-report td:nth-child(4), .recap-report td:nth-child(5), .recap-report th:nth-child(3), .recap-report th:nth-child(4), .recap-report th:nth-child(5) { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .recap-report td:first-child, .recap-report td:nth-child(3) { font-weight: 700; }
+  .recap-report .badge { font-size: 10pt; line-height: inherit; }
+  .recap-report tfoot td { background: #f3eee3; font-weight: 700; border-top: .8pt solid #171410; }
+  /* Individual receipt: compact enough for ordinary 20-25 line payrolls. */
+  .receipt { font-family: Arial, sans-serif; color: #171410; line-height: 1.25; margin: 0; width: 100%; border-radius: 0; }
+  .receipt-title { text-align: left; padding: 0 0 3mm; margin: 0 0 3mm; border-bottom: .8pt solid #171410; }
+  .receipt-title .brand { justify-content: flex-start; font-size: 13pt; font-weight: 700; letter-spacing: 1pt; }
+  .receipt-title h1 { font-size: 16pt; line-height: 1.25; margin: 1mm 0; font-weight: 700; }
+  .receipt-title p { font-size: 9pt; line-height: 1.25; color: #171410; }
+  .receipt .receipt-worker { margin: 0 0 3mm; gap: 2mm; }
+  .receipt .receipt-worker strong { font-size: 11pt; }
+  .receipt .receipt-worker span { font-size: 10pt; color: #171410; }
+  .receipt table { width: 100%; }
+  .receipt th:first-child { width: 42%; }
+  .receipt th:nth-child(2) { width: 12%; }
+  .receipt th:nth-child(3), .receipt th:nth-child(4) { width: 23%; }
+  .receipt th, .receipt td { padding: 1.4mm 1.5mm; font-size: 10pt; line-height: 1.25; color: #171410; border-bottom: .3pt solid #b9ae9d; }
+  .receipt th { background: #f3eee3; font-weight: 700; border-bottom: .8pt solid #171410; }
+  .receipt td:last-child { font-weight: 700; }
+  .receipt td:nth-child(3), .receipt td:nth-child(4) { white-space: nowrap; }
+  .receipt .receipt-payment { break-inside: avoid; margin-top: 3mm; }
+  .receipt .total { margin: 0; padding: 2.5mm; background: #f3eee3; border-top: .8pt solid #171410; }
+  .receipt .total strong { font-size: 12pt; color: #171410; }
+  .receipt .notice { padding: 1mm 2.5mm; border: 0; background: none; }
+  .receipt .notice .summaryrow { margin: 1.5mm 0; }
+  .receipt .notice span, .receipt .notice strong { font-size: 10pt; color: #171410; }
+  .receipt .receipt-signatures { margin-top: 5mm; font-size: 10pt; break-inside: avoid; }
+  .receipt .receipt-deductions { margin: 0 0 2mm; padding: 0 2.5mm; color: #171410; }
+  .receipt .receipt-deductions .summaryrow { margin: 0; padding: 1.5mm 0; font-size: 10pt; }
+  .receipt .receipt-deductions .summaryrow span { font-size: 10pt; color: #171410; }
 }

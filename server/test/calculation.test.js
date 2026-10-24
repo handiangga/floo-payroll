@@ -17,6 +17,11 @@ const base = {
   cash: 50000,
   transfers: [{ destination: "BRI", amount: 100000 }],
 };
+test("deduction category is preserved without changing payroll math", () => {
+  const result = calculate({ ...base, adjustments: [{ kind: "deduction", category: "bon", label: "Bon", qty: 1, rate: 10000 }], transfers: [{ destination: "BRI", amount: 90000 }] }, worker, models);
+  assert.equal(result.adjustments[0].category, "bon");
+  assert.equal(result.net, 140000);
+});
 test("tarif jahit dan snapshot transaksi", () => {
   const r = calculate(base, worker, models);
   models[0].sewingRate = 40000;

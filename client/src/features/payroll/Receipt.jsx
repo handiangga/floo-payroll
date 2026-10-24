@@ -1,6 +1,11 @@
-import { rup, dateLabel } from "../../lib/format";
+import { rup, dateLabel, fileDate } from "../../lib/format";
+import usePrintTitle from "../../hooks/usePrintTitle";
 import { Printer } from "lucide-react";
 export default function Receipt({ row: r, period, onBack }) {
+  const deductions = r.adjustments.filter((a) => a.kind === "deduction");
+  const deductionTotal = deductions.reduce((sum, a) => sum + Math.abs(Number(a.total)), 0);
+  const safeName = r.workerName.replace(/[<>:"/\\|?*\x00-\x1f]/g, " ").trim();
+  usePrintTitle(`nota ${safeName}${period?.date ? ` tanggal ${fileDate(period.date)}` : ""}`);
   return (
     <>
       <div className="flex gap-3 mb-4 no-print">
@@ -13,13 +18,13 @@ export default function Receipt({ row: r, period, onBack }) {
       <article className="box receipt">
         <div className="receipt-title">
           <div className="brand justify-center">FLOO FASHION</div>
-          <h1>Nota upah borongan</h1>
+          <h1>Nota gaji mingguan</h1>
           <p>
             No. FJ-{period?.date.replaceAll("-", "")}-
             {String(r.id).padStart(4, "0")}
           </p>
         </div>
-        <div className="summaryrow">
+        <div className="summaryrow receipt-worker">
           <strong>
             {r.workerName} · {r.job === "jahit" ? "Penjahit" : "Pemotong"}
           </strong>
@@ -43,11 +48,10 @@ export default function Receipt({ row: r, period, onBack }) {
                 <td>{rup(l.total)}</td>
               </tr>
             ))}
-            {r.adjustments.map((a, i) => (
+            {r.adjustments.filter((a) => a.kind !== "deduction").map((a, i) => (
               <tr key={"a" + i}>
                 <td>
                   {a.label}
-                  {a.kind === "deduction" ? " (potongan)" : ""}
                 </td>
                 <td>{a.qty}</td>
                 <td>{rup(a.rate)}</td>
@@ -56,6 +60,11 @@ export default function Receipt({ row: r, period, onBack }) {
             ))}
           </tbody>
         </table></div>
+        <section className="receipt-payment">
+        {deductions.length > 0 && <div className="receipt-deductions">
+          <div className="summaryrow"><strong>Gaji sebelum potongan</strong><strong>{rup(Number(r.net) + deductionTotal)}</strong></div>
+          {deductions.map((a, i) => <div className="summaryrow" key={i}><span>{a.label}</span><strong>−{rup(Math.abs(Number(a.total)))}</strong></div>)}
+        </div>}
         <div className="summaryrow total">
           <strong>Gaji bersih</strong>
           <strong>{rup(r.net)}</strong>
@@ -72,7 +81,8 @@ export default function Receipt({ row: r, period, onBack }) {
             </div>
           ))}
         </div>
-        <div className="flex justify-between mt-12">
+        </section>
+        <div className="flex justify-between mt-12 receipt-signatures">
           <span>
             Admin
             <br />

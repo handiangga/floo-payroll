@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { rup } from "../../lib/format";
+import { normalizeDeduction } from "../../lib/adjustments";
 import { Field, Amount } from "../../components/ui/Fields";
 import { Trash2, Plus } from "lucide-react";
 export default function PayrollForm({
@@ -22,7 +23,7 @@ export default function PayrollForm({
         { modelId: "", qty: 1 },
       ],
     ),
-    [adj, setAdj] = useState(edit?.adjustments || []),
+    [adj, setAdj] = useState(() => (edit?.adjustments || []).map(normalizeDeduction)),
     [cash, setCash] = useState(edit?.cash || 0),
     [dest, setDest] = useState(edit?.transfers[0]?.destination || ""),
     [others, setOthers] = useState(edit?.transfers.slice(1) || []);
@@ -236,16 +237,17 @@ export default function PayrollForm({
               const change = (k, v) =>
                 setAdj(adj.map((x, j) => (i === j ? { ...x, [k]: v } : x)));
               return (
-                <div className="adjustrow" key={i}>
+                <div className={`adjustrow ${a.kind === "deduction" ? "deduction-input" : ""}`} key={i}>
                   <Field label="Jenis">
                     <select
                       value={a.kind}
-                      onChange={(e) => change("kind", e.target.value)}
+                      onChange={(e) => setAdj(adj.map((x, j) => i === j ? normalizeDeduction({ ...x, kind: e.target.value, category: undefined }) : x))}
                     >
                       <option value="addition">Tambahan</option>
                       <option value="deduction">Potongan</option>
                     </select>
                   </Field>
+                  {a.kind === "deduction" && <Field label="Jenis potongan"><select required value={a.category || ""} onChange={(e) => change("category", e.target.value)}><option value="">Pilih jenis potongan</option><option value="bon">Bon</option><option value="other">Lainnya</option></select></Field>}
                   <Field label="Keterangan">
                     <input
                       required
@@ -253,15 +255,15 @@ export default function PayrollForm({
                       onChange={(e) => change("label", e.target.value)}
                     />
                   </Field>
-                  <Field label="Jumlah">
+                  {a.kind !== "deduction" && <Field label="Jumlah">
                     <Amount
                       min="1"
                       required
                       value={a.qty}
                       onChange={(v) => change("qty", v)}
                     />
-                  </Field>
-                  <Field label="Tarif (Rp)">
+                  </Field>}
+                  <Field label={a.kind === "deduction" ? "Nominal potongan (Rp)" : "Tarif (Rp)"}>
                     <Amount
                       money
                       required
