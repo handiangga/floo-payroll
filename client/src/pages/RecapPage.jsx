@@ -1,5 +1,6 @@
 import { rup, dateLabel, fileDate } from "../lib/format";
 import usePrintTitle from "../hooks/usePrintTitle";
+import { summarizePeriod } from "../lib/report";
 import { api } from "../lib/api";
 import { ask, success } from "../lib/dialogs";
 import { Printer, Trash2, Pencil, FileText } from "lucide-react";
@@ -14,6 +15,7 @@ export default function RecapPage({
   loadRows,
   busy,
 }) {
+  const bonReport = summarizePeriod(period || {}, rows);
   usePrintTitle(period?.date ? `rekap tanggal ${fileDate(period.date)}` : "rekap gaji mingguan");
   const sums = rows.reduce(
     (s, r) => ({
@@ -138,6 +140,10 @@ export default function RecapPage({
           )}
         </div>
       </div>
+      <section className="box no-print">
+        <h2>Daftar pembayaran bon · {period ? dateLabel(period.date) : "Pilih periode"}</h2>
+        {!bonReport.bonPayments.length ? <p>Belum ada pembayaran bon pada periode ini.</p> : <div className="overflow-x-auto"><table><thead><tr><th>Pekerja</th><th className="text-right">Bayar bon</th></tr></thead><tbody>{bonReport.bonPayments.map((payment, i) => <tr key={i}><td>{payment.workerName}</td><td className="text-right"><strong>{rup(payment.amount)}</strong></td></tr>)}</tbody><tfoot><tr><td><strong>Total pembayaran bon</strong></td><td className="text-right"><strong>{rup(bonReport.bon)}</strong></td></tr></tfoot></table></div>}
+      </section>
       <p className="hint">
         Pembagian cash dan transfer adalah catatan alokasi gaji.
       </p>
